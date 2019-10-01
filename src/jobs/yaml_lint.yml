@@ -1,0 +1,17 @@
+description: >
+  yaml linting
+
+executor: yaml
+
+parameters:
+  lint-dir:
+    type: string
+    default: .
+    description: >
+      Directory within to lint all yaml files,
+      defaults to the working directory (.)
+
+steps:
+  - update_alpine_and_checkout
+  - run: gem install yaml-lint
+  - run: yaml-lint -i <<parameters.lint-dir>>/ <<parameters.lint-dir>>/.circleci/ <<parameters.lint-dir>>/.github/

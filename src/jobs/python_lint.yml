@@ -1,0 +1,17 @@
+description: >
+  python linting
+
+executor: python
+
+parameters:
+  lint-dir:
+    type: string
+    default: .
+    description: >
+      Directory within to lint all python files,
+      defaults to the working directory (.)
+
+steps:
+  - update_alpine_and_checkout
+  - run: pip install --no-cache-dir pylint
+  - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.py" -exec pylint \{\} \+

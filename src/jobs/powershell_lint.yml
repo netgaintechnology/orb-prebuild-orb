@@ -1,0 +1,17 @@
+description: >
+  powershell linting
+
+executor: powershell
+
+parameters:
+  lint-dir:
+    type: string
+    default: .
+    description: >
+      Directory within to lint all powershell files,
+      defaults to the working directory (.)
+
+steps:
+  - checkout
+  - run: Install-Module -Name PSScriptAnalyzer
+  - run: Invoke-ScriptAnalyzer -Path <<parameters.lint-dir>>

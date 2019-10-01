@@ -1,0 +1,7 @@
+description: >
+  Official Docker image for golang on alpine linux
+
+resource_class: small
+
+docker:
+  - image: golang:alpine

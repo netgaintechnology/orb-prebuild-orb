@@ -1,0 +1,7 @@
+description: >
+  Docker image for microsoft powershell
+
+resource_class: small
+
+docker:
+  - image: mcr.microsoft.com/powershell

@@ -1,9 +1,4 @@
 version: 2.1
 
 description: >
-  Sample orb description
-  # What will your orb allow users to do?
-  # Descriptions should be short, simple, and clear.
-
-orbs:
-  hello: circleci/hello-build@0.0.5 # Sample imported orb
+  Orb for pre-build jobs. Full orb source code: https://github.com/netgaintechnology/orb-prebuild-orb

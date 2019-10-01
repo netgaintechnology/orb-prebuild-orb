@@ -1,0 +1,7 @@
+description: >
+  Docker image for chef-workstation
+
+resource_class: small
+
+docker:
+  - image: chef/chefworkstation:current

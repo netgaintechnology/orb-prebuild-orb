@@ -10,6 +10,7 @@ usage:
     linting-tools: netgaintechnology/linting-orb@x.y.z
 
   workflows:
+    version: 2
     linting:
       jobs:
         - linting-tools/yaml_lint

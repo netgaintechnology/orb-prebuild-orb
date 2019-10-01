@@ -5,7 +5,7 @@ version: 2.1
 # you can use scripts/publish-alpha.sh to publish a @dev:alpha release
 orbs:
   prebuild-orb: netgaintechnology/prebuild-orb@dev:alpha
-  orb-tools: circleci/orb-tools@8.27.3
+  orb-tools: circleci/orb-tools@volatile
 
 workflows:
   # this `lint-pack_validate_publish-dev` workflow will run on any commit

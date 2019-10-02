@@ -11,8 +11,9 @@ workflows:
   # this `lint-pack_validate_publish-dev` workflow will run on any commit
   lint-pack_validate_publish-dev:
     jobs:
-      # lint your destructured orb YAML files
+      # lint your destructured orb YAML and markdown files
       - prebuild-orb/yaml_lint
+      - prebuild-orb/markdown_lint
 
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed

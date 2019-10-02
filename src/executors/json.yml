@@ -1,7 +1,7 @@
 description: >
   Official Docker image for python on alpine linux
 
-resource_class: small
+resource_class: medium
 
 docker:
   - image: python:alpine

@@ -1,0 +1,237 @@
+commands:
+  update_alpine_and_checkout:
+    description: |
+      Run Alpine updates to ensure we are running latest versions of software and checkout git repo locally.
+    parameters:
+      packages:
+        default: bash git wget curl openssh unzip nano tar gzip build-base
+        description: space separated list of extra packages to install
+        type: string
+    steps:
+    - run: apk update && apk upgrade
+    - run: apk add --no-cache <<parameters.packages>>
+    - checkout
+description: |
+  Orb for pre-build jobs. Full orb source code: https://github.com/netgaintechnology/orb-prebuild-orb
+examples:
+  workflow-example:
+    description: |
+      Use the various linting jobs in your config.yml workflow section to find linting errors. See the orb's GitHub README for a version of this example with extensive usage and context comments: https://github.com/netgaintechnology/orb-prebuild-orb#examples
+    usage:
+      orbs:
+        linting-tools: netgaintechnology/linting-orb@x.y.z
+      version: 2.1
+      workflows:
+        linting:
+          jobs:
+          - linting-tools/yaml_lint
+          - linting-tools/markdown_lint
+          - liting-tools/json_lint
+        version: 2
+executors:
+  ansible:
+    description: |
+      Official Docker image for python on alpine linux
+    docker:
+    - image: python:alpine
+    resource_class: medium
+  chef:
+    description: |
+      Docker image for chef-workstation
+    docker:
+    - image: chef/chefworkstation:current
+    resource_class: medium
+  default:
+    description: |
+      This is the default executor using Docker and Alpine linux.
+    docker:
+    - image: alpine:<<parameters.tag>>
+    parameters:
+      tag:
+        default: latest
+        description: |
+          Pick a specific alpine image variant: https://hub.docker.com/_/alpine?tab=tags
+        type: string
+  golang:
+    description: |
+      Official Docker image for golang on alpine linux
+    docker:
+    - image: golang:alpine
+    resource_class: medium
+  json:
+    description: |
+      Official Docker image for python on alpine linux
+    docker:
+    - image: python:alpine
+    resource_class: medium
+  markdown:
+    description: |
+      Official Docker image for ruby on alpine linux
+    docker:
+    - image: ruby:alpine
+    resource_class: medium
+  powershell:
+    description: |
+      Docker image for microsoft powershell
+    docker:
+    - image: mcr.microsoft.com/powershell
+    resource_class: medium
+  python:
+    description: |
+      Official Docker image for python on alpine linux
+    docker:
+    - image: python:alpine
+    resource_class: medium
+  terraform:
+    description: |
+      Docker image for terraform on alpine linux
+    docker:
+    - image: hashicorp/terraform
+    resource_class: medium
+  yaml:
+    description: |
+      Official Docker image for ruby on alpine linux
+    docker:
+    - image: ruby:alpine
+    resource_class: medium
+jobs:
+  ansible_lint:
+    description: |
+      ansible linting
+    executor: ansible
+    parameters:
+      lint-dir:
+        default: .
+        description: |
+          Directory within to lint all ansible files, defaults to the working directory (.)
+        type: string
+    steps:
+    - update_alpine_and_checkout
+    - run: pip install --no-cache-dir ansible-lint
+    - run: ansible-lint <<parameters.lint-dir>>/*.(yaml|yml)$
+  chef_lint:
+    description: |
+      chef linting
+    executor: chef
+    parameters:
+      lint-dir:
+        default: .
+        description: |
+          Directory within to lint all chef files, defaults to the working directory (.)
+        type: string
+    steps:
+    - checkout
+    - run: cookstyle -P <<parameters.lint-dir>>
+  golang_lint:
+    description: |
+      golang linting
+    executor: golang
+    parameters:
+      lint-dir:
+        default: .
+        description: |
+          Directory within to lint all golang files, defaults to the working directory (.)
+        type: string
+    steps:
+    - update_alpine_and_checkout
+    - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh|
+        sh -s -- -b /bin
+    - run: golongci-lint run --enable-all <<parameters.lint-dir>>/...
+  json_lint:
+    description: |
+      json linting
+    executor: json
+    parameters:
+      lint-dir:
+        default: .
+        description: |
+          Directory within to lint all json files, defaults to the working directory (.)
+        type: string
+    steps:
+    - update_alpine_and_checkout
+    - run: pip install --no-cache-dir demjson
+    - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.json"
+        -exec jsonlint \{\} \+
+  markdown_lint:
+    description: |
+      markdown linting
+    executor: markdown
+    parameters:
+      lint-dir:
+        default: .
+        description: |
+          Directory within to lint all markdown files, defaults to the working directory (.)
+        type: string
+    steps:
+    - update_alpine_and_checkout
+    - run: gem install mdl
+    - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.md" -exec
+        mdl \{\} \+
+  powershell_lint:
+    description: |
+      powershell linting
+    executor: powershell
+    parameters:
+      lint-dir:
+        default: .
+        description: |
+          Directory within to lint all powershell files, defaults to the working directory (.)
+        type: string
+    steps:
+    - checkout
+    - run: Install-Module -Name PSScriptAnalyzer
+    - run: Invoke-ScriptAnalyzer -Path <<parameters.lint-dir>>
+  python_lint:
+    description: |
+      python linting
+    executor: python
+    parameters:
+      lint-dir:
+        default: .
+        description: |
+          Directory within to lint all python files, defaults to the working directory (.)
+        type: string
+    steps:
+    - update_alpine_and_checkout
+    - run: pip install --no-cache-dir pylint
+    - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.py" -exec
+        pylint \{\} \+
+  terraform_lint:
+    description: |
+      terraform linting
+    executor: terraform
+    parameters:
+      lint-dir:
+        default: .
+        description: |
+          Directory within to lint all terraform files, defaults to the working directory (.)
+        type: string
+    steps:
+    - update_alpine_and_checkout
+    - run:
+        command: |
+          if [[ -n "$(terraform fmt -check -recursive <<parameters.lint-dir>>)" ]]; then
+          echo "Some terraform files need be formatted, run 'terraform fmt' to fix";
+          exit 1;
+          fi
+        name: Lint Terraform
+    - run: terraform init -upgrade <<parameters.lint-dir>>
+    - run: terraform validate <<parameters.lint-dir>>
+    - run: terraform plan <<parameters.lint-dir>>
+  yaml_lint:
+    description: |
+      yaml linting
+    executor: yaml
+    parameters:
+      lint-dir:
+        default: .
+        description: |
+          Directory within to lint all yaml files, defaults to the working directory (.)
+        type: string
+    steps:
+    - update_alpine_and_checkout
+    - run: gem install yaml-lint
+    - run: yaml-lint -i <<parameters.lint-dir>>/ <<parameters.lint-dir>>/.circleci/
+        <<parameters.lint-dir>>/.github/
+version: 2.1
+

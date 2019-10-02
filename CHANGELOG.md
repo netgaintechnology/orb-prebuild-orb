@@ -1,5 +1,5 @@
 # orb-prebuild-orb CHANGELOG
 
-## 0.0.0 (2019-10-01)
+## 1.0.0 (2019-10-02)
 
 - [corey.hemminger] - Initial Release

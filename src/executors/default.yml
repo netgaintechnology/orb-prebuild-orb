@@ -3,10 +3,11 @@ description: >
 
 docker:
   - image: 'alpine:<<parameters.tag>>'
+
 parameters:
   tag:
     default: latest
     description: >
-      Pick a specific circleci/node image variant:
+      Pick a specific alpine image variant:
       https://hub.docker.com/_/alpine?tab=tags
     type: string

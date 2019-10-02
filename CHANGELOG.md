@@ -1,4 +1,4 @@
-# orb-prebuild-orb CHANGELOG
+# prebuild-orb CHANGELOG
 
 ## 1.0.0 (2019-10-02)
 

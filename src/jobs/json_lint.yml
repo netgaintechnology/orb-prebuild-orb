@@ -1,0 +1,17 @@
+description: >
+  json linting
+
+executor: json
+
+parameters:
+  lint-dir:
+    type: string
+    default: .
+    description: >
+      Directory within to lint all json files,
+      defaults to the working directory (.)
+
+steps:
+  - update_alpine_and_checkout
+  - run: pip install --no-cache-dir demjson
+  - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.json" -exec jsonlint \{\} \+

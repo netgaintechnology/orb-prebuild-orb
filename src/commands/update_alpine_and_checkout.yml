@@ -1,0 +1,13 @@
+description: >
+  Run Alpine updates to ensure we are running latest versions of software and checkout git repo locally.
+
+parameters:
+  packages:
+    type: string
+    default: "bash git wget curl openssh unzip nano tar gzip build-base"
+    description: "space separated list of extra packages to install"
+
+steps:
+  - run: apk update && apk upgrade
+  - run: apk add --no-cache <<parameters.packages>>
+  - checkout

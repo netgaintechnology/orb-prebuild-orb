@@ -1,0 +1,18 @@
+description: >
+  Use the various linting jobs in your config.yml workflow section to find linting errors.
+  See the orb's GitHub README for a version of this example with extensive usage and context comments:
+  https://github.com/netgaintechnology/orb-prebuild-orb#examples
+
+usage:
+  version: 2.1
+
+  orbs:
+    linting-tools: netgaintechnology/linting-orb@x.y.z
+
+  workflows:
+    version: 2
+    linting:
+      jobs:
+        - linting-tools/yaml_lint
+        - linting-tools/markdown_lint
+        - liting-tools/json_lint

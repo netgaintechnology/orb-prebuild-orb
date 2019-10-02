@@ -1,0 +1,16 @@
+description: >
+  chef linting
+
+executor: chef
+
+parameters:
+  lint-dir:
+    type: string
+    default: .
+    description: >
+      Directory within to lint all chef files,
+      defaults to the working directory (.)
+
+steps:
+  - checkout
+  - run: cookstyle -P <<parameters.lint-dir>>

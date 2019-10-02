@@ -1,0 +1,17 @@
+description: >
+  markdown linting
+
+executor: markdown
+
+parameters:
+  lint-dir:
+    type: string
+    default: .
+    description: >
+      Directory within to lint all markdown files,
+      defaults to the working directory (.)
+
+steps:
+  - update_alpine_and_checkout
+  - run: gem install mdl
+  - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.md" -exec mdl \{\} \+

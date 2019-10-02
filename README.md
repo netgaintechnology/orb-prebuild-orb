@@ -1,5 +1,4 @@
 # prbuild-orb
-
 [![CircleCI](https://circleci.com/gh/netgaintechnology/orb-prebuild-orb.svg?style=svg)](https://circleci.com/gh/netgaintechnology/orb-prebuild-orb) [![CircleCI Community](https://img.shields.io/badge/community-CircleCI%20Discuss-343434.svg)](https://discuss.circleci.com/c/ecosystem/orbs)
 
 An orb managing pre-build phase jobs such as linting and formating.

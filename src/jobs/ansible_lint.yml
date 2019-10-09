@@ -13,5 +13,5 @@ parameters:
 
 steps:
   - update_alpine_and_checkout
-  - run: pip install --no-cache-dir ansible-lint
+  - run: apk add --no-cache ansible-lint
   - run: ansible-lint <<parameters.lint-dir>>/*.(yaml|yml)$

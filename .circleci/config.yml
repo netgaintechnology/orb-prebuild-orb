@@ -56,7 +56,6 @@ workflows:
           filters:
             branches:
               only: master
-
   # yaml anchor filters
   integration-dev_filters: &integration-dev_filters
     branches:
@@ -69,6 +68,7 @@ workflows:
       ignore: /.*/
     tags:
       only: /master-.*/
+
 
   # this `integration-tests_prod-release` workflow will ignore commits
   # it is only triggered by git tags, which are created in the job above
@@ -87,8 +87,8 @@ workflows:
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
-#          requires:
-#            - your integration testing jobs go here
+          #          requires:
+          #            - your integration testing jobs go here
           filters:
             branches:
               ignore: /.*/
@@ -101,21 +101,22 @@ workflows:
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
-#          requires:
-#            - your integration testing jobs go here
+          #          requires:
+          #            - your integration testing jobs go here
           filters:
             branches:
               ignore: /.*/
             tags:
               only: /master-minor.*/
-       - orb-tools/dev-promote-prod:
+
+      - orb-tools/dev-promote-prod:
           name: dev-promote-major
           release: major
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
-#          requires:
-#            - your integration testing jobs go here
+          #          requires:
+          #            - your integration testing jobs go here
           filters:
             branches:
               ignore: /.*/

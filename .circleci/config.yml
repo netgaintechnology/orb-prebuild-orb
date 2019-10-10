@@ -5,9 +5,8 @@ version: 2.1
 # you can use scripts/publish-alpha.sh to publish a @dev:alpha release
 orbs:
   cli: circleci/circleci-cli@volatile
-  prebuild-orb: netgaintechnology/prebuild-orb@volatile
+  prebuild-orb: netgaintechnology/prebuild-orb@dev:alpha
   orb-tools: circleci/orb-tools@volatile
-  prebuild-orb-alpha: netgaintechnology/prebuild-orb@dev:alpha
 
 jobs:
   test:
@@ -35,9 +34,12 @@ jobs:
           param: CIRCLE_BUILD_NUM,CIRCLE_BRANCH,CIRCLE_BUILD_URL,CIRCLE_JOB
       - orb-tools/publish:
           orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
-      - orb-tools/increment:
-          orb-ref: netgaintechnology/prebuild-orb
-          segment: <<parameters.segment>>
+      - when:
+          condition: {{ .Branch }} == "master"
+          steps:
+            - orb-tools/increment:
+                orb-ref: netgaintechnology/prebuild-orb
+                segment: <<parameters.segment>>
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters

@@ -4,10 +4,10 @@ description: >
 parameters:
   packages:
     type: string
-    default: "bash git wget curl openssh unzip nano tar gzip build-base"
+    default: "bash git wget curl openssh unzip nano tar gzip build-base binutils cmake make libgcc musl-dev gcc g++"
     description: "space separated list of extra packages to install"
 
 steps:
-  - run: apk update && apk upgrade
+  - run: apk update && apk upgrade --no-cashe
   - run: apk add --no-cache <<parameters.packages>>
   - checkout

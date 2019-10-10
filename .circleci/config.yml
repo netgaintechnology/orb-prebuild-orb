@@ -7,6 +7,18 @@ orbs:
   prebuild-orb: netgaintechnology/prebuild-orb@volatile
   orb-tools: circleci/orb-tools@volatile
 
+# yaml anchor filters
+integration-dev_filters: &integration-dev_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /integration-.*/
+integration-master_filters: &integration-master_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /master-.*/
+
 workflows:
   # this `lint-pack_validate_publish-dev` workflow will run on any commit
   lint-pack_validate_publish-dev:
@@ -56,19 +68,6 @@ workflows:
           filters:
             branches:
               only: master
-  # yaml anchor filters
-  integration-dev_filters: &integration-dev_filters
-    branches:
-      ignore: /.*/
-    tags:
-      only: /integration-.*/
-
-  integration-master_filters: &integration-master_filters
-    branches:
-      ignore: /.*/
-    tags:
-      only: /master-.*/
-
 
   # this `integration-tests_prod-release` workflow will ignore commits
   # it is only triggered by git tags, which are created in the job above

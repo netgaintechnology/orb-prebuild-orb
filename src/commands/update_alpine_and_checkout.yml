@@ -8,6 +8,6 @@ parameters:
     description: "space separated list of extra packages to install"
 
 steps:
-  - run: apk update && apk upgrade --no-cashe
+  - run: apk update && apk upgrade --no-cache
   - run: apk add --no-cache <<parameters.packages>>
   - checkout

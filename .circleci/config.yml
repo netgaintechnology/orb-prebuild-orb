@@ -74,8 +74,8 @@ workflows:
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
-          requires:
-            # - your integration testing jobs go here
+#          requires:
+#            - your integration testing jobs go here
           filters:
             branches:
               ignore: /.*/
@@ -88,8 +88,8 @@ workflows:
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
-          requires:
-            # - your integration testing jobs go here
+#          requires:
+#            - your integration testing jobs go here
           filters:
             branches:
               ignore: /.*/
@@ -101,8 +101,8 @@ workflows:
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
-          requires:
-            # - your integration testing jobs go here
+#          requires:
+#            - your integration testing jobs go here
           filters:
             branches:
               ignore: /.*/

@@ -4,14 +4,12 @@ version: 2.1
 # release must exist; you'll need to publish manually at least once)
 # you can use scripts/publish-alpha.sh to publish a @dev:alpha release
 orbs:
-  cli: circleci/circleci-cli@volatile
   prebuild-orb: netgaintechnology/prebuild-orb@volatile
   orb-tools: circleci/orb-tools@volatile
   prebuild-orb-alpha: netgaintechnology/prebuild-orb@dev:alpha
-  queue: eddiewebb/queue@volatile
 
 jobs:
-  test-commands:
+  test:
     parameters:
       executor:
         type: executor
@@ -27,7 +25,6 @@ jobs:
 
     steps:
       - checkout
-      - cli/install
       - orb-tools/install-bats
       - orb-tools/pack
       - orb-tools/validate

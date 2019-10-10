@@ -4,8 +4,46 @@ version: 2.1
 # release must exist; you'll need to publish manually at least once)
 # you can use scripts/publish-alpha.sh to publish a @dev:alpha release
 orbs:
+  cli: circleci/circleci-cli@volatile
   prebuild-orb: netgaintechnology/prebuild-orb@volatile
   orb-tools: circleci/orb-tools@volatile
+  prebuild-orb-alpha: netgaintechnology/prebuild-orb@dev:alpha
+  queue: eddiewebb/queue@volatile
+
+jobs:
+  test-commands:
+    parameters:
+      executor:
+        type: executor
+
+      segment:
+        description: >
+          The semver segment to increment 'major' or 'minor' or 'patch'
+        type: enum
+        enum: [major, minor, patch]
+        default: patch
+
+    executor: <<parameters.executor>>
+
+    steps:
+      - checkout
+
+      - cli/install
+
+      - orb-tools/install-bats
+      - orb-tools/pack
+      - orb-tools/validate
+
+      - orb-tools/check-env-var-param:
+          command-name: Test `check-env-var-param` command with built-in env vars
+          param: CIRCLE_BUILD_NUM,CIRCLE_BRANCH,CIRCLE_BUILD_URL,CIRCLE_JOB
+
+      - orb-tools/publish:
+          orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
+
+      - orb-tools/increment:
+          orb-ref: netgaintechnology/prebuild-orb
+          segment: <<parameters.segment>>
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
@@ -19,6 +57,21 @@ integration-master_filters: &integration-master_filters
   tags:
     only: /master-.*/
 
+prod-deploy_requires: &prod-deploy_requires
+  [
+    test-increment-job-master
+  ]
+
+requires_commands_dev: &requires_commands_dev
+  [
+    test-commands-dev-alpine,
+  ]
+
+requires_commands_master: &requires_commands_master
+  [
+    test-commands-master-alpine,
+  ]
+
 workflows:
   # this `lint-pack_validate_publish-dev` workflow will run on any commit
   lint-pack_validate_publish-dev:
@@ -30,6 +83,10 @@ workflows:
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack:
+          source-dir: src
+          destination-orb-path: orb.yml
+          workspace-path: orb.yml
+          artifact-path: orb.yml
           requires:
             - prebuild-orb/yaml_lint
 
@@ -39,9 +96,14 @@ workflows:
       # store CIRCLE_TOKEN as a project env var or Contexts resource
       # if using Contexts, add your context below
       - orb-tools/publish-dev:
+          context: orb-publishing
           orb-name: netgaintechnology/prebuild-orb
           requires:
             - orb-tools/pack
+
+      - queue/block_workflow:
+          requires:
+            - orb-tools/publish-dev
 
       # trigger an integration workflow to test the dev version of your orb
       # an SSH key must be stored in your orb's repository and in CircleCI
@@ -51,7 +113,7 @@ workflows:
           name: trigger-integration-dev
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           requires:
-            - orb-tools/publish-dev
+            - queue/block_workflow
           filters:
             branches:
               ignore: master
@@ -64,7 +126,7 @@ workflows:
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           tag: master
           requires:
-            - orb-tools/publish-dev
+            - queue/block_workflow
           filters:
             branches:
               only: master
@@ -73,21 +135,117 @@ workflows:
   # it is only triggered by git tags, which are created in the job above
   integration-tests_prod-release:
     jobs:
-      # - your integration test jobs go here
-      # - you will want to call each integration testing job twice,
-      # - each under a different name:
-      # - once, for integration tests triggered by non-master-branch commits
-      # - and again, for tests triggered by commits to master
-      # - only commits to master should potentially trigger a prod release
+      # triggered by non-master branch commits
+      # test commands with executors
+      - test-commands:
+          name: test-commands-dev-alpine
+          executor: orb-tools/alpine
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      # test jobs
+      - orb-tools/pack:
+          name: test-pack-job-dev
+          workspace-path: orb.yml
+          artifact-path: orb.yml
+          filters: *integration-dev_filters
+          requires: *requires_commands_dev
+
+      - orb-tools/test-in-builds:
+          name: test-in-builds-job-dev
+          context: orb-publishing
+          attach-workspace: true
+          orb-name: orb-tools
+          filters: *integration-dev_filters
+          requires: [test-pack-job-dev]
+          test-steps:
+            - checkout
+            - orb-tools/install-bats
+            - orb-tools/pack
+            - orb-tools/validate
+            - orb-tools/publish:
+                orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
+            - orb-tools/increment:
+                orb-ref: netgaintechnology/prebuild-orb
+
+      - orb-tools/publish:
+          name: test-publish-job-dev
+          attach-workspace: true
+          context: orb-publishing
+          orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
+          filters: *integration-dev_filters
+          requires:
+            - test-pack-job-dev
+
+      - orb-tools/increment:
+          name: test-increment-job-dev
+          attach-workspace: true
+          context: orb-publishing
+          orb-ref: netgaintechnology/prebuild-orb
+          filters: *integration-dev_filters
+          requires:
+            - test-in-builds-job-dev
+            - test-publish-job-dev
+
+      # triggered by master branch commits
+      # test commands with executors
+      - test-commands:
+          name: test-commands-master-alpine
+          executor: orb-tools/alpine
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      # test jobs
+      - orb-tools/pack:
+          name: test-pack-job-master
+          workspace-path: orb.yml
+          artifact-path: orb.yml
+          filters: *integration-master_filters
+          requires: *requires_commands_master
+
+      - orb-tools/test-in-builds:
+          name: test-in-builds-job-master
+          context: orb-publishing
+          attach-workspace: true
+          orb-name: orb-tools
+          filters: *integration-master_filters
+          requires: [test-pack-job-master]
+          test-steps:
+            - checkout
+            - orb-tools/install-bats
+            - orb-tools/pack
+            - orb-tools/validate
+            - orb-tools/publish:
+                orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
+            - orb-tools/increment:
+                orb-ref: netgaintechnology/prebuild-orb
+
+      - orb-tools/publish:
+          name: test-publish-job-master
+          attach-workspace: true
+          context: orb-publishing
+          orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
+          filters: *integration-master_filters
+          requires: [test-pack-job-master]
+
+      - orb-tools/increment:
+          name: test-increment-job-master
+          attach-workspace: true
+          context: orb-publishing
+          orb-ref: netgaintechnology/prebuild-orb
+          filters: *integration-master_filters
+          requires:
+            - test-in-builds-job-master
+            - test-publish-job-master
 
       # patch, minor, or major publishing
       - orb-tools/dev-promote-prod:
           name: dev-promote-patch
+          context: orb-publishing
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
-          #          requires:
-          #            - your integration testing jobs go here
+          requires: *prod-deploy_requires
           filters:
             branches:
               ignore: /.*/
@@ -97,11 +255,11 @@ workflows:
       - orb-tools/dev-promote-prod:
           name: dev-promote-minor
           release: minor
+          context: orb-publishing
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
-          #          requires:
-          #            - your integration testing jobs go here
+          requires: *prod-deploy_requires
           filters:
             branches:
               ignore: /.*/
@@ -111,11 +269,11 @@ workflows:
       - orb-tools/dev-promote-prod:
           name: dev-promote-major
           release: major
+          context: orb-publishing
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
-          #          requires:
-          #            - your integration testing jobs go here
+          requires: *prod-deploy_requires
           filters:
             branches:
               ignore: /.*/

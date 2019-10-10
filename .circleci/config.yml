@@ -162,8 +162,6 @@ workflows:
             - orb-tools/validate
             - orb-tools/publish:
                 orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
-            - orb-tools/increment:
-                orb-ref: netgaintechnology/prebuild-orb
 
       - orb-tools/publish:
           name: test-publish-job-dev
@@ -202,7 +200,8 @@ workflows:
           attach-workspace: true
           orb-name: orb-tools
           filters: *integration-master_filters
-          requires: [test-pack-job-master]
+          requires:
+            - test-pack-job-master
           test-steps:
             - checkout
             - orb-tools/install-bats
@@ -210,15 +209,14 @@ workflows:
             - orb-tools/validate
             - orb-tools/publish:
                 orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
-            - orb-tools/increment:
-                orb-ref: netgaintechnology/prebuild-orb
 
       - orb-tools/publish:
           name: test-publish-job-master
           attach-workspace: true
           orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
           filters: *integration-master_filters
-          requires: [test-pack-job-master]
+          requires:
+            - test-pack-job-master
 
       - orb-tools/increment:
           name: test-increment-job-master

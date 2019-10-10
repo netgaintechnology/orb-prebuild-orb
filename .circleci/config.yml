@@ -57,6 +57,19 @@ workflows:
             branches:
               only: master
 
+  # yaml anchor filters
+  integration-dev_filters: &integration-dev_filters
+    branches:
+      ignore: /.*/
+    tags:
+      only: /integration-.*/
+
+  integration-master_filters: &integration-master_filters
+    branches:
+      ignore: /.*/
+    tags:
+      only: /master-.*/
+
   # this `integration-tests_prod-release` workflow will ignore commits
   # it is only triggered by git tags, which are created in the job above
   integration-tests_prod-release:
@@ -108,16 +121,3 @@ workflows:
               ignore: /.*/
             tags:
               only: /master-major.*/
-
-# yaml anchor filters
-integration-dev_filters: &integration-dev_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /integration-.*/
-
-integration-master_filters: &integration-master_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /master-.*/

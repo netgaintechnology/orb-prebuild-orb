@@ -96,7 +96,6 @@ workflows:
       # store CIRCLE_TOKEN as a project env var or Contexts resource
       # if using Contexts, add your context below
       - orb-tools/publish-dev:
-          context: orb-publishing
           orb-name: netgaintechnology/prebuild-orb
           requires:
             - orb-tools/pack
@@ -140,7 +139,6 @@ workflows:
       - test-commands:
           name: test-commands-dev-alpine
           executor: orb-tools/alpine
-          context: orb-publishing
           filters: *integration-dev_filters
 
       # test jobs
@@ -153,7 +151,6 @@ workflows:
 
       - orb-tools/test-in-builds:
           name: test-in-builds-job-dev
-          context: orb-publishing
           attach-workspace: true
           orb-name: orb-tools
           filters: *integration-dev_filters
@@ -171,7 +168,6 @@ workflows:
       - orb-tools/publish:
           name: test-publish-job-dev
           attach-workspace: true
-          context: orb-publishing
           orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
           filters: *integration-dev_filters
           requires:
@@ -180,7 +176,6 @@ workflows:
       - orb-tools/increment:
           name: test-increment-job-dev
           attach-workspace: true
-          context: orb-publishing
           orb-ref: netgaintechnology/prebuild-orb
           filters: *integration-dev_filters
           requires:
@@ -192,7 +187,6 @@ workflows:
       - test-commands:
           name: test-commands-master-alpine
           executor: orb-tools/alpine
-          context: orb-publishing
           filters: *integration-master_filters
 
       # test jobs
@@ -205,7 +199,6 @@ workflows:
 
       - orb-tools/test-in-builds:
           name: test-in-builds-job-master
-          context: orb-publishing
           attach-workspace: true
           orb-name: orb-tools
           filters: *integration-master_filters
@@ -223,7 +216,6 @@ workflows:
       - orb-tools/publish:
           name: test-publish-job-master
           attach-workspace: true
-          context: orb-publishing
           orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
           filters: *integration-master_filters
           requires: [test-pack-job-master]
@@ -231,7 +223,6 @@ workflows:
       - orb-tools/increment:
           name: test-increment-job-master
           attach-workspace: true
-          context: orb-publishing
           orb-ref: netgaintechnology/prebuild-orb
           filters: *integration-master_filters
           requires:
@@ -241,7 +232,6 @@ workflows:
       # patch, minor, or major publishing
       - orb-tools/dev-promote-prod:
           name: dev-promote-patch
-          context: orb-publishing
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
@@ -255,7 +245,6 @@ workflows:
       - orb-tools/dev-promote-prod:
           name: dev-promote-minor
           release: minor
-          context: orb-publishing
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true
@@ -269,7 +258,6 @@ workflows:
       - orb-tools/dev-promote-prod:
           name: dev-promote-major
           release: major
-          context: orb-publishing
           orb-name: circleci/orb-tools
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           cleanup-tags: true

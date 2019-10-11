@@ -1,6 +1,6 @@
 # prebuild-orb CHANGELOG
 
-## 1.0.9 (2019-10-10)
+## 1.0.10 (2019-10-10)
 
 - [corey.hemminger] - fix ansible-lint install
 

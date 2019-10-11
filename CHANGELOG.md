@@ -1,8 +1,8 @@
 # prebuild-orb CHANGELOG
 
-## 1.0.13 (2019-10-11)
+## 1.0.14 (2019-10-11)
 
-- [corey.hemminger] - fix 
+- [corey.hemminger] - fix publishing twice
 
 ## 1.0.10 (2019-10-10)
 

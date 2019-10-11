@@ -8,21 +8,10 @@ orbs:
   prebuild-orb: netgaintechnology/prebuild-orb@dev:alpha
   orb-tools: circleci/orb-tools@volatile
 
-jobs:
-  test:
-    parameters:
-      executor:
-        type: executor
-
-      segment:
-        description: >
-          The semver segment to increment 'major' or 'minor' or 'patch'
-        type: enum
-        enum: [major, minor, patch]
-        default: patch
-
-    executor: <<parameters.executor>>
-
+commands:
+  publish-dev:
+    description: |
+      publish dev version of orb based on branch.
     steps:
       - checkout
       - cli/install
@@ -34,12 +23,36 @@ jobs:
           param: CIRCLE_BUILD_NUM,CIRCLE_BRANCH,CIRCLE_BUILD_URL,CIRCLE_JOB
       - orb-tools/publish:
           orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
-      - when:
-          condition: {{ .Branch }} == "master"
-          steps:
-            - orb-tools/increment:
-                orb-ref: netgaintechnology/prebuild-orb
-                segment: <<parameters.segment>>
+
+jobs:
+  test-dev:
+    parameters:
+      executor:
+        type: executor
+
+    executor: <<parameters.executor>>
+
+    steps:
+      - publish-dev
+
+  test-master:
+    parameters:
+      executor:
+        type: executor
+      segment:
+        description: >
+          The semver segment to increment 'major' or 'minor' or 'patch'
+        type: enum
+        enum: [major, minor, patch]
+        default: patch
+
+    executor: <<parameters.executor>>
+
+    steps:
+      - publish-dev
+      - orb-tools/increment:
+          orb-ref: netgaintechnology/prebuild-orb
+          segment: <<parameters.segment>>
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
@@ -115,14 +128,14 @@ workflows:
       # triggered by non-master branch commits
       # test commands with executors
       # alpine
-      - test:
+      - test-dev:
           name: alpine-dev
           executor: orb-tools/alpine
           filters: *integration-dev_filters
 
       # triggered by master branch commits
       # alpine
-      - test:
+      - test-master:
           name: alpine-master
           executor: orb-tools/alpine
           filters: *integration-master_filters

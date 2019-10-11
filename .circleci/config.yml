@@ -9,7 +9,7 @@ orbs:
   orb-tools: circleci/orb-tools@volatile
 
 commands:
-  publish-dev:
+  pack-validate-orb:
     description: |
       publish dev version of orb based on branch.
     steps:
@@ -21,8 +21,6 @@ commands:
       - orb-tools/check-env-var-param:
           command-name: Test `check-env-var-param` command with built-in env vars
           param: CIRCLE_BUILD_NUM,CIRCLE_BRANCH,CIRCLE_BUILD_URL,CIRCLE_JOB
-      - orb-tools/publish:
-          orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
 
 jobs:
   test-dev:
@@ -33,7 +31,9 @@ jobs:
     executor: <<parameters.executor>>
 
     steps:
-      - publish-dev
+      - pack-validate-orb
+      - orb-tools/publish:
+          orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
 
   test-master:
     parameters:
@@ -49,7 +49,7 @@ jobs:
     executor: <<parameters.executor>>
 
     steps:
-      - publish-dev
+      - pack-validate-orb
       - orb-tools/increment:
           orb-ref: netgaintechnology/prebuild-orb
           segment: <<parameters.segment>>

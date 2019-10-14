@@ -13,4 +13,4 @@ parameters:
 
 steps:
   - checkout
-  - run: cookstyle -P <<parameters.lint-dir>>
+  - run: cookstyle -P --fail-level A <<parameters.lint-dir>>

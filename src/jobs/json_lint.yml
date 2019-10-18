@@ -1,4 +1,4 @@
-description: >
+description: |
   json linting
 
 executor: json

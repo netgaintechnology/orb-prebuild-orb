@@ -40,7 +40,7 @@ jobs:
       executor:
         type: executor
       segment:
-        description: >
+        description: |
           The semver segment to increment 'major' or 'minor' or 'patch'
         type: enum
         enum: [major, minor, patch]

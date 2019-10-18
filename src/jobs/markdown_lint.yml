@@ -1,4 +1,4 @@
-description: >
+description: |
   markdown linting
 
 executor: markdown
@@ -7,7 +7,7 @@ parameters:
   lint-dir:
     type: string
     default: .
-    description: >
+    description: |
       Directory within to lint all markdown files,
       defaults to the working directory (.)
 

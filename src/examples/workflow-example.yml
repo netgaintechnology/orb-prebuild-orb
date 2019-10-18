@@ -1,4 +1,4 @@
-description: >
+description: |
   Use the various linting jobs in your config.yml workflow section to find linting errors.
   See the orb's GitHub README for a version of this example with extensive usage and context comments:
   https://github.com/netgaintechnology/orb-prebuild-orb#examples

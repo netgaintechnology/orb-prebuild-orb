@@ -1,4 +1,4 @@
-description: >
+description: |
   terraform linting
 
 executor: terraform
@@ -7,12 +7,20 @@ parameters:
   lint-dir:
     type: string
     default: .
-    description: >
+    description: |
       Directory within to lint all terraform files,
       defaults to the working directory (.)
 
 steps:
   - update_alpine_and_checkout
+  - run: |
+    cat <<~EOF > ~/.terraformrc
+      # Terraform CLI config
+      credentials "app.terraform.io" {
+        token = "$TFIO_TOKEN"
+      }
+  - run: terraform init -upgrade <<parameters.lint-dir>>
+  - run: terraform validate <<parameters.lint-dir>>
   - run:
       name: Lint Terraform
       command: |
@@ -20,6 +28,3 @@ steps:
         echo "Some terraform files need be formatted, run 'terraform fmt' to fix";
         exit 1;
         fi
-  - run: terraform init -upgrade <<parameters.lint-dir>>
-  - run: terraform validate <<parameters.lint-dir>>
-  - run: terraform plan <<parameters.lint-dir>>

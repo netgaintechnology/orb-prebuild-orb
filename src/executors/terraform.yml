@@ -1,4 +1,4 @@
-description: >
+description: |
   Docker image for terraform on alpine linux
 
 resource_class: medium

@@ -1,4 +1,4 @@
-description: >
+description: |
   Official Docker image for ruby on alpine linux
 
 resource_class: medium

@@ -10,6 +10,11 @@ parameters:
     description: |
       Directory within to lint all terraform files,
       defaults to the working directory (.)
+  tf-workspace:
+    type: string
+    default: dev
+    description: |
+      Terraform workspace to use
 
 steps:
   - update_alpine_and_checkout
@@ -19,7 +24,7 @@ steps:
         credentials "app.terraform.io" {
           token = "$TFIO_TOKEN"
         }
-  - run: terraform workspace new dev
+  - run: terraform workspace new <<parameters.tf-workspace>>
   - run: terraform init -upgrade <<parameters.lint-dir>>
   - run: terraform validate <<parameters.lint-dir>>
   - run:

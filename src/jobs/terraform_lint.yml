@@ -19,6 +19,7 @@ steps:
         credentials "app.terraform.io" {
           token = "$TFIO_TOKEN"
         }
+  - run: terraform workspace create dev
   - run: terraform init -upgrade <<parameters.lint-dir>>
   - run: terraform validate <<parameters.lint-dir>>
   - run:

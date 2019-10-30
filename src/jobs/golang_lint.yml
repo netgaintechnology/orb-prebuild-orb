@@ -14,4 +14,4 @@ parameters:
 steps:
   - update_alpine_and_checkout
   - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b /bin
-  - run: golangci-lint run --enable-all <<parameters.lint-dir>>/...
+  - run: golangci-lint run <<parameters.lint-dir>>/... --enable-all=true

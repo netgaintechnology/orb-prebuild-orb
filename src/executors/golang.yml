@@ -4,4 +4,4 @@ description: >
 resource_class: medium
 
 docker:
-  - image: golang:alpine
+  - image: golangci/golangci-lint:latest-alpine

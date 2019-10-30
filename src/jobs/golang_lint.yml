@@ -1,4 +1,4 @@
-description: >
+description: |
   golang linting
 
 executor: golang
@@ -7,11 +7,10 @@ parameters:
   lint-dir:
     type: string
     default: .
-    description: >
+    description: |
       Directory within to lint all golang files,
       defaults to the working directory (.)
 
 steps:
   - update_alpine_and_checkout
-  - run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b /bin
-  - run: golangci-lint run <<parameters.lint-dir>>/... --enable-all=true
+  - run: golangci-lint run <<parameters.lint-dir>>/...

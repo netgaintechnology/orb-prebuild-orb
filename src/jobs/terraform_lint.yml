@@ -17,6 +17,18 @@ parameters:
     description: |
       Terraform workspace to use
 
+  github_user:
+        description: |
+          Env var of Github username
+        type: env_var_name
+        default: GITHUB_USER
+
+  github_token:
+        description: |
+          Env var of Github token
+        type: env_var_name
+        default: GITHUB_TOKEN
+
 steps:
   - update_alpine_and_checkout
   - run: |
@@ -28,21 +40,21 @@ steps:
 
 # Add Github creds for private repo use, conditional on env vars being present
   - when:
-      condition: $GITHUB_USER
+      condition: $<<parameters.github_user>>
       steps:
         - run:
             name: Set Github User
             command: |
-              echo "https://$GITHUB_USER:$GITHUB_TOKEN@github.com" > ~/.git-credentials
+              echo "https://$<<parameters.github_user>>:$<<parameters.github_token>>@github.com" > ~/.git-credentials
 
   - when:
-      condition: $GITHUB_USER
+      condition: $<<parameters.github_user>>
       steps:
         - run:
             name: Set Github Cred Helper
             command: |
               echo "[user]"  > ~/.gitconfig
-              echo "  name = $GITHUB_USER" >> ~/.gitconfig
+              echo "  name = $<<parameters.github_user>> >> ~/.gitconfig
               echo "[credential]" >> ~/.gitconfig
               echo "  helper = store" >> ~/.gitconfig
 

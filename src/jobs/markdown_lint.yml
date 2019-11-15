@@ -10,21 +10,8 @@ parameters:
     description: |
       Directory within to lint all markdown files,
       defaults to the working directory (.)
-  rule-exclusions:
-    type: string
-    default: ""
-    description: |
-      Rule numbers to exclude from linting
 
 steps:
   - update_alpine_and_checkout
   - run: gem install mdl
-  - when:
-      condition: <<parameters.rule-exclusions>>
-      steps:
-        - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.md" -exec mdl \{\} \+ -r <<parameters.rule-exclusions>>
-  - unless:
-      condition: <<parameters.rule-exclusions>>
-      steps:
-        - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.md" -exec mdl \{\} \+
-        
+  - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.md" -exec mdl \{\} \+

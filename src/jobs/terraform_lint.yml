@@ -19,40 +19,39 @@ parameters:
 
 steps:
   - update_alpine_and_checkout
+  # Terraform Cloud Access
   - run: |
-      cat \<<~EOF > ~/.terraformrc
-        # Terraform CLI config
-        credentials "app.terraform.io" {
-          token = "$TFIO_TOKEN"
-        }
-
-# Add Github creds for private repo use, conditional on env vars being present
-  - when:
-      condition: $GITHUB_USER
-      steps:
-        - run:
-            name: Set Github User
-            command: |
-              echo "https://$GITHUB_USER:$GITHUB_TOKEN@github.com" > ~/.git-credentials
-
-  - when:
-      condition: $GITHUB_USER
-      steps:
-        - run:
-            name: Set Github Cred Helper
-            command: |
-              echo "[user]"  > ~/.gitconfig
-              echo "  name = $GITHUB_USER" >> ~/.gitconfig
-              echo "[credential]" >> ~/.gitconfig
-              echo "  helper = store" >> ~/.gitconfig
-
+      echo "# Terraform CLI config" > ~/.terraformrc
+      echo "credentials \"app.terraform.io\" {" >> ~/.terraformrc
+      echo "  token = \"$TFIO_TOKEN\"" >> ~/.terraformrc
+      echo "}" >> ~/.terraformrc
+  # AWS Cloud Access
+  - run: |
+      mkdir ~/.aws
+      echo "[default]" > ~/.aws/credentials
+      echo "aws_access_key_id = $AWS_ACCESS_KEY_ID-<<parameters.tf-workspace>>" >> ~/.aws/credentials
+      echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY-<<parameters.tf-workspace>>" >> ~/.aws/credentials
+  # Azure Cloud Access
+  - run: |
+      mkdir ~/.azure
+      echo "[default]"
+      echo "subscription_id=$AZURE_SUBSCRIPTION_ID-<<parameters.tf-workspace>>]" > ~/.azure/credentials
+      echo "client_id=$AZURE_CLIENT_ID-<<parameters.tf-workspace>>" >> ~/.azure/credentials
+      echo "secret=$AZURE_CLIENT_SECRET-<<parameters.tf-workspace>>" >> ~/.azure/credentials
+      echo "tenant_id=$AZURE_TENANT_ID-<<parameters.tf-workspace>>" >> ~/.azure/credentials
+  # GITHUB Private Repo Access
+  - run: |
+      echo "https://$GITHUB_USER:$GITHUB_TOKEN@github.com" > ~/.git-credentials
+      echo "[user]"  > ~/.gitconfig
+      echo "  name = $GITHUB_USER" >> ~/.gitconfig
+      echo "[credential]" >> ~/.gitconfig
+      echo "  helper = store" >> ~/.gitconfig
+  # Real work
   - run: terraform workspace new <<parameters.tf-workspace>>
   - run: terraform init -upgrade <<parameters.lint-dir>>
   - run: terraform validate <<parameters.lint-dir>>
-  - run:
-      name: Lint Terraform
-      command: |
-        if [[ -n "$(terraform fmt -check -recursive <<parameters.lint-dir>>)" ]]; then
-        echo "Some terraform files need be formatted, run 'terraform fmt' to fix";
-        exit 1;
-        fi
+  - run: |
+      if [[ -n "$(terraform fmt -check -recursive <<parameters.lint-dir>>)" ]]; then
+      echo "Some terraform files need be formatted, run 'terraform fmt' to fix";
+      exit 1;
+      fi

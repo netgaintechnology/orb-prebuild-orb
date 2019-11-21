@@ -42,4 +42,4 @@ steps:
       command: packer --version
   - run:
       name: Validate Packer config.json
-      command: packer validate /git/packer/config.json
+      command: packer validate ~/${CIRCLE_PROJECT_REPONAME}/config.json

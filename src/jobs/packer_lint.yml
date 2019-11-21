@@ -4,7 +4,7 @@ description: |
 executor: packer
 
 steps:
-  - checkout
+  - update_alpine_and_checkout
 
 # Add Github creds for private repo use, conditional on env vars being present
   - when:
@@ -26,7 +26,6 @@ steps:
               echo "[credential]" >> ~/.gitconfig
               echo "  helper = store" >> ~/.gitconfig
 
-  - checkout
   - run:
       name: Update system packages
       command: |
@@ -41,5 +40,8 @@ steps:
       name: Packer version check
       command: packer --version
   - run:
+      name: test
+      command: ls -lah
+  - run:
       name: Validate Packer config.json
-      command: packer validate ${CIRCLE_PROJECT_REPONAME}/config.json
+      command: packer validate config.json

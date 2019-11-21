@@ -1,5 +1,5 @@
 description: |
-  Packer config validation
+  Packer config file validation
 
 executor: packer
 

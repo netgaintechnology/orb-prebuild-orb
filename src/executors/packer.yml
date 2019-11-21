@@ -1,0 +1,7 @@
+description: |
+  Docker image for Packer on alpine linux
+
+resource_class: medium
+
+docker:
+  - image: alpine:latest

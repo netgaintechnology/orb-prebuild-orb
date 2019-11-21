@@ -1,0 +1,45 @@
+description: |
+  Packer config validation
+
+executor: packer
+
+steps:
+  - checkout
+
+# Add Github creds for private repo use, conditional on env vars being present
+  - when:
+      condition: $GITHUB_USER
+      steps:
+        - run:
+            name: Set Github User
+            command: |
+              echo "https://$GITHUB_USER:$GITHUB_TOKEN@github.com" > ~/.git-credentials
+
+  - when:
+      condition: $GITHUB_USER
+      steps:
+        - run:
+            name: Set Github Cred Helper
+            command: |
+              echo "[user]"  > ~/.gitconfig
+              echo "  name = $GITHUB_USER" >> ~/.gitconfig
+              echo "[credential]" >> ~/.gitconfig
+              echo "  helper = store" >> ~/.gitconfig
+
+  - checkout
+  - run:
+      name: Update system packages
+      command: |
+        apk add --update git bash openssl curl openssh-client python py-boto py-dateutil py-httplib2 py-jinja2 py-paramiko py-pip py-setuptools py-yaml tar unzip
+  - run:
+      name: Download and Install Packer
+      command: |
+        wget https://releases.hashicorp.com/packer/1.4.5/packer_1.4.5_linux_amd64.zip
+        unzip packer_1.4.5_linux_amd64.zip -d /bin
+        ls -lah /bin/packer
+  - run:
+      name: Packer version check
+      command: packer --version
+  - run:
+      name: Validate Packer config.json
+      command: packer validate /git/packer/config.json

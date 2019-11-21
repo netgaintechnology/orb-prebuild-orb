@@ -29,7 +29,7 @@ steps:
   - run:
       name: Update system packages
       command: |
-        apk add --update git bash openssl curl openssh-client python py-boto py-dateutil py-httplib2 py-jinja2 py-paramiko py-pip py-setuptools py-yaml tar unzip
+        apk add --update unzip
   - run:
       name: Download and Install Packer
       command: |
@@ -39,9 +39,6 @@ steps:
   - run:
       name: Packer version check
       command: packer --version
-  - run:
-      name: test
-      command: ls -lah
   - run:
       name: Validate Packer config.json
       command: packer validate config.json

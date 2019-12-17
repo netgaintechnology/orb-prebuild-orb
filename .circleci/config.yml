@@ -112,7 +112,6 @@ workflows:
       # the 2nd job (below) may also publish a production orb version
       - orb-tools/trigger-integration-workflow:
           name: trigger-integration-master
-          cleanup-tags: true
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
           tag: master
           requires:
@@ -145,7 +144,6 @@ workflows:
           name: dev-promote-patch
           orb-name: netgaintechnology/prebuild-orb
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
-          cleanup-tags: true
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -158,7 +156,6 @@ workflows:
           release: minor
           orb-name: netgaintechnology/prebuild-orb
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
-          cleanup-tags: true
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -171,7 +168,6 @@ workflows:
           release: major
           orb-name: netgaintechnology/prebuild-orb
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
-          cleanup-tags: true
           requires: *prod-deploy_requires
           filters:
             branches:

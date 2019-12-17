@@ -1,5 +1,9 @@
 # prebuild-orb CHANGELOG
 
+## 1.0.16 (2019-12-17)
+
+- [murray.butler] - add golang lint and test steps
+
 ## 1.0.15 (2019-11-15)
 
 - [murray.butler] - add github creds for private repos

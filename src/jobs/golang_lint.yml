@@ -4,11 +4,17 @@ description: |
 executor: golang
 
 parameters:
-  lint-dir:
+  cmd-dir:
     type: string
     default: .
     description: |
-      Directory within to lint all golang files,
+      Directory of buildable golang files,
+      defaults to the working directory (.)
+  pkg-dir:
+    type: string
+    default: .
+    description: |
+      Directory of shared golang files,
       defaults to the working directory (.)
   test-dir:
     type: string
@@ -18,6 +24,8 @@ parameters:
 
 steps:
   - update_alpine_and_checkout
-  - run: golangci-lint run <<parameters.lint-dir>>/...
-  - run: go fmt -l <<parameters.lint-dir>>/...
+  - run: golangci-lint run <<parameters.cmd-dir>>/...
+  - run: golangci-lint run <<parameters.pkg-dir>>/...
+  - run: gofmt -l <<parameters.cmd-dir>>/...
+  - run: gofmt -l <<parameters.pkg-dir>>/...
   - run: go test <<parameters.test-dir>>/...

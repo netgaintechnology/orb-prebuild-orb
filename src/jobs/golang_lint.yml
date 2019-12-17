@@ -10,8 +10,14 @@ parameters:
     description: |
       Directory within to lint all golang files,
       defaults to the working directory (.)
+  test-dir:
+    type: string
+    default: test
+    description: |
+      Directory for unit tests against codebase (test)
 
 steps:
   - update_alpine_and_checkout
   - run: golangci-lint run <<parameters.lint-dir>>/...
   - run: go fmt -l <<parameters.lint-dir>>/...
+  - run: go test <<parameters.test-dir>>/...

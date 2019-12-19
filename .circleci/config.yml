@@ -1,10 +1,6 @@
 version: 2.1
 
-# add your orb below, to be used in integration tests (note: a @dev:alpha
-# release must exist; you'll need to publish manually at least once)
-# you can use scripts/publish-alpha.sh to publish a @dev:alpha release
 orbs:
-  cli: circleci/circleci-cli@volatile
   prebuild-orb: netgaintechnology/prebuild-orb@volatile
   orb-tools: circleci/orb-tools@volatile
 
@@ -14,14 +10,21 @@ workflows:
     jobs:
       # lint your destructured orb YAML and markdown files
       - prebuild-orb/yaml_lint
+        filters:
+          branches:
+            ignore: master
       - prebuild-orb/markdown_lint
-
+        filters:
+          branches:
+            ignore: master
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack:
           requires:
             - prebuild-orb/yaml_lint
-
+          filters:
+            branches:
+              ignore: master
       # release dev version of orb, for testing & possible publishing
       # requires a CircleCI API token to be stored as CIRCLE_TOKEN (default)
       # https://circleci.com/docs/2.0/managing-api-tokens
@@ -32,8 +35,7 @@ workflows:
           requires:
             - orb-tools/pack
 
-  # this `integration-tests_prod-release` workflow will ignore commits
-  # it is only triggered by git tags, which are created in the job above
+  # Pack orb and publish new version with patch number incremented
   promote-orb:
     jobs:
       - orb-tools/pack:
@@ -48,6 +50,13 @@ workflows:
           filters:
             branches:
               only: master
+
+#      # publish a semver version of the orb. relies on
+#      # the commit subject containing the text "[semver:patch|minor|major|skip]"
+#      # as that will determine whether a patch, minor or major
+#      # version will be published or if publishing should
+#      # be skipped.
+#      # e.g. [semver:patch] will cause a patch version to be published.
 #      - orb-tools/dev-promote-prod-from-commit-subject:
 #          orb-name: netgaintechnology/prebuild-orb
 #          add-pr-comment: false

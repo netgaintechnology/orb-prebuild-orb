@@ -10,13 +10,13 @@ workflows:
     jobs:
       # lint your destructured orb YAML and markdown files
       - prebuild-orb/yaml_lint
-        filters:
-          branches:
-            ignore: master
+          filters:
+            branches:
+              ignore: master
       - prebuild-orb/markdown_lint
-        filters:
-          branches:
-            ignore: master
+          filters:
+            branches:
+              ignore: master
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack:

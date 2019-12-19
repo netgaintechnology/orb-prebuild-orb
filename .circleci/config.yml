@@ -36,19 +36,26 @@ workflows:
   # it is only triggered by git tags, which are created in the job above
   promote-orb:
     jobs:
+      - orb-tools/pack:
+          filters:
+            branches:
+              only: master
       - orb-tools/increment:
           orb-ref: netgaintechnology/prebuild-orb
-          filters:
-            branches:
-              only: master
-      - orb-tools/dev-promote-prod-from-commit-subject:
-          orb-name: netgaintechnology/prebuild-orb
-          add-pr-comment: false
-          publish-version-tag: true
-          fail-if-semver-not-indicated: false
-          ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
+          attach-workspace: true
           requires:
-            - orb-tools/increment
+            - orb-tools/pack
           filters:
             branches:
               only: master
+#      - orb-tools/dev-promote-prod-from-commit-subject:
+#          orb-name: netgaintechnology/prebuild-orb
+#          add-pr-comment: false
+#          publish-version-tag: true
+#          fail-if-semver-not-indicated: true
+#          ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
+#          requires:
+#            - orb-tools/increment
+#          filters:
+#            branches:
+#              only: master

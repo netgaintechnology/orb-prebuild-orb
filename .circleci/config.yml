@@ -32,7 +32,7 @@ workflows:
 
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed
-      - pack-validate-orb:
+      - orb-tools/pack:
           requires:
             - prebuild-orb/yaml_lint
 
@@ -44,16 +44,16 @@ workflows:
       - orb-tools/publish-dev:
           orb-name: netgaintechnology/prebuild-orb
           requires:
-            - pack-validate-orb
+            - orb-tools/pack
 
   # this `integration-tests_prod-release` workflow will ignore commits
   # it is only triggered by git tags, which are created in the job above
   promote-orb:
     jobs:
-      - pack-validate-orb:
-          filters:
-            branches:
-              only: master
+      #- pack-validate-orb:
+      #    filters:
+      #      branches:
+      #        only: master
       - orb-tools/increment:
           orb-ref: netgaintechnology/prebuild-orb
           requires:

@@ -6,7 +6,7 @@ version: 2.1
 orbs:
   cli: circleci/circleci-cli@volatile
   prebuild-orb: netgaintechnology/prebuild-orb@dev:alpha
-  orb-tools: circleci/orb-tools@volatile
+  orb-tools: circleci/orb-tools@8.27.6
 
 commands:
   pack-validate-orb:

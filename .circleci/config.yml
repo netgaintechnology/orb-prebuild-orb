@@ -10,8 +10,15 @@ orbs:
 
 jobs:
   pack-validate-orb:
-    description: |
-      publish dev version of orb based on branch.
+    parameters:
+      executor:
+        type: executor
+      segment:
+        description: |
+          publish dev version of orb based on branch.
+
+    executor: <<parameters.executor>>
+
     steps:
       - checkout
       - cli/install

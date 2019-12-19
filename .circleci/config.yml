@@ -8,20 +8,6 @@ orbs:
   prebuild-orb: netgaintechnology/prebuild-orb@volatile
   orb-tools: circleci/orb-tools@volatile
 
-jobs:
-  pack-validate-orb:
-    description: |
-      publish dev version of orb based on branch.
-    executor: orb-tools/alpine
-    steps:
-      - checkout
-      - cli/install
-      - orb-tools/pack
-      - orb-tools/validate
-      - orb-tools/check-env-var-param:
-          command-name: Test `check-env-var-param` command with built-in env vars
-          param: CIRCLE_BUILD_NUM,CIRCLE_BRANCH,CIRCLE_BUILD_URL,CIRCLE_JOB
-
 workflows:
   # this `lint-pack_validate_publish-dev` workflow will run on any commit
   lint-pack_validate_publish-dev:
@@ -50,14 +36,8 @@ workflows:
   # it is only triggered by git tags, which are created in the job above
   promote-orb:
     jobs:
-      #- pack-validate-orb:
-      #    filters:
-      #      branches:
-      #        only: master
       - orb-tools/increment:
           orb-ref: netgaintechnology/prebuild-orb
-          #requires:
-          #  - pack-validate-orb
           filters:
             branches:
               only: master

@@ -49,7 +49,7 @@ workflows:
   # it is only triggered by git tags, which are created in the job above
   promote-orb:
     jobs:
-      - pack-validate-orb
+      - pack-validate-orb:
         filters:
           branches:
             only: master

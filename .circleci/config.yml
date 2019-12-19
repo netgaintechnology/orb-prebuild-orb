@@ -50,10 +50,20 @@ workflows:
   promote-orb:
     jobs:
       - pack-validate-orb
+        filters:
+          branches:
+            only: master
       - orb-tools/increment:
+        requires:
+          - pack-validate-orb
+        filters:
+          branches:
+            only: master
       - orb-tools/dev-promote-prod:
           orb-name: netgaintechnology/prebuild-orb
           ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
+          requires:
+            - orb-tools/increment
           filters:
             branches:
               only: master

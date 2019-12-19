@@ -8,7 +8,7 @@ orbs:
   prebuild-orb: netgaintechnology/prebuild-orb@volatile
   orb-tools: circleci/orb-tools@volatile
 
-commands:
+jobs:
   pack-validate-orb:
     description: |
       publish dev version of orb based on branch.

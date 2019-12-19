@@ -19,7 +19,6 @@ orbs:
   linting-tools: netgaintechnology/prebuild-orb@x.y.z
 
 workflows:
-  version: 2
   linting:
     jobs:
       - linting-tools/yaml_lint

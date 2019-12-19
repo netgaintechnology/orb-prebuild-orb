@@ -12,12 +12,7 @@ jobs:
   pack-validate-orb:
     description: |
       publish dev version of orb based on branch.
-    parameters:
-      executor:
-        type: executor
-
-    executor: <<parameters.executor>>
-
+    executor: orb-tools/alpine
     steps:
       - checkout
       - cli/install

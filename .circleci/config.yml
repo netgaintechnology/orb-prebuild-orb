@@ -1,90 +1,31 @@
 version: 2.1
 
-# add your orb below, to be used in integration tests (note: a @dev:alpha
-# release must exist; you'll need to publish manually at least once)
-# you can use scripts/publish-alpha.sh to publish a @dev:alpha release
 orbs:
-  cli: circleci/circleci-cli@volatile
-  prebuild-orb: netgaintechnology/prebuild-orb@dev:alpha
-  orb-tools: circleci/orb-tools@8.27.6
+  prebuild-orb: netgaintechnology/prebuild-orb@volatile
+  orb-tools: circleci/orb-tools@volatile
 
-commands:
-  pack-validate-orb:
-    description: |
-      publish dev version of orb based on branch.
-    steps:
-      - checkout
-      - cli/install
-      - orb-tools/install-bats
-      - orb-tools/pack
-      - orb-tools/validate
-      - orb-tools/check-env-var-param:
-          command-name: Test `check-env-var-param` command with built-in env vars
-          param: CIRCLE_BUILD_NUM,CIRCLE_BRANCH,CIRCLE_BUILD_URL,CIRCLE_JOB
-
-jobs:
-  test-dev:
-    parameters:
-      executor:
-        type: executor
-
-    executor: <<parameters.executor>>
-
-    steps:
-      - pack-validate-orb
-      - orb-tools/publish:
-          orb-ref: netgaintechnology/prebuild-orb@dev:$CIRCLE_TAG
-
-  test-master:
-    parameters:
-      executor:
-        type: executor
-      segment:
-        description: |
-          The semver segment to increment 'major' or 'minor' or 'patch'
-        type: enum
-        enum: [major, minor, patch]
-        default: patch
-
-    executor: <<parameters.executor>>
-
-    steps:
-      - pack-validate-orb
-      - orb-tools/increment:
-          orb-ref: netgaintechnology/prebuild-orb
-          segment: <<parameters.segment>>
-
-# yaml anchor filters
-integration-dev_filters: &integration-dev_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /integration-.*/
-integration-master_filters: &integration-master_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /master-.*/
-
-prod-deploy_requires: &prod-deploy_requires
-  [
-    alpine-master
-  ]
 
 workflows:
   # this `lint-pack_validate_publish-dev` workflow will run on any commit
   lint-pack_validate_publish-dev:
     jobs:
       # lint your destructured orb YAML and markdown files
-      - prebuild-orb/yaml_lint
-      - prebuild-orb/markdown_lint
-
+      - prebuild-orb/yaml_lint:
+          filters:
+            branches:
+              ignore: master
+      - prebuild-orb/markdown_lint:
+          filters:
+            branches:
+              ignore: master
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack:
           requires:
             - prebuild-orb/yaml_lint
-
+          filters:
+            branches:
+              ignore: master
       # release dev version of orb, for testing & possible publishing
       # requires a CircleCI API token to be stored as CIRCLE_TOKEN (default)
       # https://circleci.com/docs/2.0/managing-api-tokens
@@ -95,82 +36,36 @@ workflows:
           requires:
             - orb-tools/pack
 
-      # trigger an integration workflow to test the dev version of your orb
-      # an SSH key must be stored in your orb's repository and in CircleCI
-      # (add the public key as a read/write key on GitHub; add the private
-      # key in CircleCI via SSH Permissions, with github.com as Hostname)
-      - orb-tools/trigger-integration-workflow:
-          name: trigger-integration-dev
-          ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
-          requires:
-            - orb-tools/publish-dev
+  # Pack orb and publish new version with patch number incremented
+  promote-orb:
+    jobs:
+      - orb-tools/pack:
           filters:
             branches:
-              ignore: master
-
-      # by default, the 1st job (above) will trigger only integration tests;
-      # the 2nd job (below) may also publish a production orb version
-      - orb-tools/trigger-integration-workflow:
-          name: trigger-integration-master
-          ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
-          tag: master
+              only: master
+      - orb-tools/increment:
+          orb-ref: netgaintechnology/prebuild-orb
+          attach-workspace: true
           requires:
-            - orb-tools/publish-dev
+            - orb-tools/pack
           filters:
             branches:
               only: master
 
-  # this `integration-tests_prod-release` workflow will ignore commits
-  # it is only triggered by git tags, which are created in the job above
-  integration-tests_prod-release:
-    jobs:
-      # triggered by non-master branch commits
-      # test commands with executors
-      # alpine
-      - test-dev:
-          name: alpine-dev
-          executor: orb-tools/alpine
-          filters: *integration-dev_filters
-
-      # triggered by master branch commits
-      # alpine
-      - test-master:
-          name: alpine-master
-          executor: orb-tools/alpine
-          filters: *integration-master_filters
-
-      # patch, minor, or major publishing
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-patch
-          orb-name: netgaintechnology/prebuild-orb
-          ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-patch.*/
-
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-minor
-          release: minor
-          orb-name: netgaintechnology/prebuild-orb
-          ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-minor.*/
-
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-major
-          release: major
-          orb-name: netgaintechnology/prebuild-orb
-          ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-major.*/
+#      # publish a semver version of the orb. relies on
+#      # the commit subject containing the text "[semver:patch|minor|major|skip]"
+#      # as that will determine whether a patch, minor or major
+#      # version will be published or if publishing should
+#      # be skipped.
+#      # e.g. [semver:patch] will cause a patch version to be published.
+#      - orb-tools/dev-promote-prod-from-commit-subject:
+#          orb-name: netgaintechnology/prebuild-orb
+#          add-pr-comment: false
+#          publish-version-tag: true
+#          fail-if-semver-not-indicated: true
+#          ssh-fingerprints: 66:04:99:1b:8e:51:e9:16:64:5f:f3:77:99:67:d6:66
+#          requires:
+#            - orb-tools/increment
+#          filters:
+#            branches:
+#              only: master

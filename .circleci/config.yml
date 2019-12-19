@@ -43,7 +43,7 @@ workflows:
       - orb-tools/publish-dev:
           orb-name: netgaintechnology/prebuild-orb
           requires:
-            - orb-tools/pack
+            - pack-validate-orb
 
   # this `integration-tests_prod-release` workflow will ignore commits
   # it is only triggered by git tags, which are created in the job above

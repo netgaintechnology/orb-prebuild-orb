@@ -55,6 +55,7 @@ workflows:
             branches:
               only: master
       - orb-tools/increment:
+          orb-ref: netgaintechnology/prebuild-orb
           requires:
             - pack-validate-orb
           filters:

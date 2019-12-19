@@ -9,11 +9,11 @@ workflows:
   lint-pack_validate_publish-dev:
     jobs:
       # lint your destructured orb YAML and markdown files
-      - prebuild-orb/yaml_lint
+      - prebuild-orb/yaml_lint:
           filters:
             branches:
               ignore: master
-      - prebuild-orb/markdown_lint
+      - prebuild-orb/markdown_lint:
           filters:
             branches:
               ignore: master

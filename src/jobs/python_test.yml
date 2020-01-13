@@ -1,0 +1,17 @@
+description: >
+  python unit tests
+
+executor: python
+
+parameters:
+  test-dir:
+    type: string
+    default: .
+    description: >
+      Directory within to lint all python files,
+      defaults to the working directory (.)
+
+steps:
+  - update_alpine_and_checkout
+  - run: pip install --no-cache-dir pytest
+  - run: python -m pytest <<parameters.test-dir>> -v

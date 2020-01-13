@@ -1,0 +1,21 @@
+description: >
+  python unit tests
+
+executor: python
+
+parameters:
+  test-dir:
+    type: string
+    default: ./tests
+    description: >
+      Directory within to lint all python files,
+      defaults to the working directory (.)
+
+steps:
+  - update_alpine_and_checkout
+  - run: apk add libffi-dev libressl-dev
+  - run: pip install --no-cache-dir pytest
+  - run: |
+      cd <<parameters.test-dir>>
+      pip install --no-cache-dir -r requirements.txt
+  - run: python -m pytest -v <<parameters.test-dir>>

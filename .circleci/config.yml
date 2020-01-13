@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   prebuild-orb: netgaintechnology/prebuild-orb@volatile
-  orb-tools: circleci/orb-tools@volatile
+  orb-tools: circleci/orb-tools@8.27.5
 
 
 workflows:

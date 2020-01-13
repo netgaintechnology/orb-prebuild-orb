@@ -14,6 +14,7 @@ parameters:
 steps:
   - update_alpine_and_checkout
   - run: |
+      apk add libffi-dev libressl-dev
       cd <<parameters.test-dir>>
       pip install --no-cache-dir pytest -r test_requirements.txt
       python -m pytest -v

@@ -13,5 +13,7 @@ parameters:
 
 steps:
   - update_alpine_and_checkout
-  - run: pip install --no-cache-dir pytest
-  - run: python -m pytest <<parameters.test-dir>> -v
+  - run: |
+      cd <<parameters.test-dir>>
+      pip install --no-cache-dir pytest -r test_requirements.txt
+      python -m pytest -v

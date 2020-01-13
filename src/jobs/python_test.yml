@@ -6,7 +6,7 @@ executor: python
 parameters:
   test-dir:
     type: string
-    default: .
+    default: ./tests
     description: >
       Directory within to lint all python files,
       defaults to the working directory (.)
@@ -16,5 +16,5 @@ steps:
   - run: |
       apk add libffi-dev libressl-dev
       cd <<parameters.test-dir>>
-      pip install --no-cache-dir pytest -r test_requirements.txt
+      pip install --no-cache-dir pytest -r requirements.txt
       python -m pytest -v

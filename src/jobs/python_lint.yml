@@ -13,5 +13,5 @@ parameters:
 
 steps:
   - update_alpine_and_checkout
-  - run: pip install --no-cache-dir pylint
+  - run: pip install --no-cache-dir 'pylint==2.4.4'
   - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.py" -exec pylint \{\} \+

@@ -1,5 +1,9 @@
 # prebuild-orb CHANGELOG
 
+## 1.0.17 (2020-04-28)
+
+- [murray.butler] - added version pin for pylint version
+
 ## 1.0.16 (2019-12-17)
 
 - [murray.butler] - add golang lint and test steps

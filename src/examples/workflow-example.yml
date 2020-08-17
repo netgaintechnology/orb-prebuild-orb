@@ -15,4 +15,4 @@ usage:
       jobs:
         - linting-tools/yaml_lint
         - linting-tools/markdown_lint
-        - liting-tools/json_lint
+        - linting-tools/json_lint

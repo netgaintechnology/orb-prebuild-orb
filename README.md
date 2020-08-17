@@ -23,8 +23,24 @@ workflows:
     jobs:
       - linting-tools/yaml_lint
       - linting-tools/markdown_lint
-      - liting-tools/json_lint
+      - linting-tools/json_lint
 ```
+
+## Available Prebuilds
+
+Available pre-build containers:
+- ansible_lint
+- chef_lint
+- golang_lint
+- javascript_lint
+- json_lint
+- markdown_lint
+- powershell_lint
+- python_lint
+- python_test
+- terraform_lint
+- terraform_module_lint
+- yaml_lint
 
 ## Contributing
 

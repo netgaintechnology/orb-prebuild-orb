@@ -1,0 +1,17 @@
+description: |
+  javascript linting
+
+executor: javascript
+
+parameters:
+  lint-dir:
+    type: string
+    default: .
+    description: >
+      Directory within to lint all javascript files,
+      defaults to the working directory (.)
+
+steps:
+  - update_alpine_and_checkout
+  - run: npm install jshint --global
+  - run: find <<parameters.lint-dir>> -not -path "*/\.*" -type f -iname "*.js" -exec jshint \{\} \+
